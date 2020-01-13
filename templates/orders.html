@@ -1,0 +1,10 @@
+<title>Orders</title>
+
+<a href="/orders/new">New post</a>
+
+<h1>Orders</h1>
+{% for order in orders %}
+<a href="/orders/{{ order.id }}"><b>Name:</b> {{ order.name }} | Author: {{ post.author }}</a>
+<br/>
+{% endfor %}
+
