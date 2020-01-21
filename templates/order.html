@@ -2,14 +2,14 @@
 <a href="/">Home</a>
 
 <h1>{{ order.name }}</h1>
-
+<h2>Price: {{ order.price }}</h2>
 <hr>
 <p>
 {{ order.description }}
 </p>
 
 <a href="/orders/{{ order.id }}/edit">Edit order</a><br/><br/>
-<form action="/orders/{{ order.id }}/delete" method="post">
-  <button type="submit">Delete post</button>
+<form action="/orders/{{ order.id }}/delete" method="POST">
+  <button type="submit">Delete order</button>
 </form>
 <br/>

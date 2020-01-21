@@ -1,9 +1,7 @@
 from database import DB
-from comment import Comment
-
 
 class Order:
-    def __init__(self, id, name, description, price, date_added, active, buyer_id = None):
+    def __init__(self, id, name, description, price, date_added, active = 1, buyer_id = 0):
         self.id = id
         self.name = name
         self.description = description
@@ -29,10 +27,10 @@ class Order:
 
     def create(self):
         with DB() as db:
-            values = (self.name, self.description, self.price, self.date_added, self.active, self.buyer_id)
+            values = (self.name, self.description, self.price, self.active, self.buyer_id)
             db.execute('''
-                INSERT INTO posts (name, description, price, date_added, active, buyer_id)
-                VALUES (?, ?, ?, ?, ?, ?)''', values)
+                INSERT INTO orders (name, description, price, date_added, active, buyer_id)
+                VALUES (?, ?, ?, date('now'), ?, ?)''', values)
             return self
 
     def save(self):
@@ -41,18 +39,17 @@ class Order:
                 self.name,
                 self.description,
                 self.price,
-                self.date_added,
                 self.active,
-                self.buyer_id
+                self.buyer_id,
                 self.id
             )
             db.execute(
-                '''UPDATE posts
-                SET name = ?, description = ?, price = ?, date_added = ?, active = ?, buyer_id = ?
+                '''UPDATE orders
+                SET name = ?, description = ?, price = ?, active = ?, buyer_id = ?
                 WHERE id = ?''', values)
             return self
 
     def delete(self):
         with DB() as db:
-            db.execute('DELETE FROM posts WHERE id = ?', (self.id,))
+            db.execute('DELETE FROM orders WHERE id = ?', (self.id,))
 
