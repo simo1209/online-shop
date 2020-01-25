@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS users
         password TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
         address TEXT,
-        phone TEXT        
+        phone TEXT,
+        salt TEXT
     )
 ''')
 conn.commit()

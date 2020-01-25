@@ -8,7 +8,10 @@ from order import Order
 from user import User
 from errors import register_error_handlers
 
+from flaskext.auth import Auth
+
 app = Flask(__name__)
+auth = Auth(app)
 
 def require_login(func):
     @wraps(func)

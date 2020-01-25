@@ -1,11 +1,20 @@
 from database import DB
 from errors import ApplicationError
 
-class User:
-	def __init__(self, email, password, username, address, phone, user_id=None):
+from flaskext.auth.auth import AuthUser
+
+import time
+
+class User(AuthUser):
+	def __init__(self, email, password, username, address, phone, user_id=None, salt = None):
 		self.id = user_id
 		self.email = email
-		self.password = password
+		if salt is None:
+			super().set_and_encrypt_password(password.encode('utf-8'),str(int(time.time())).encode('utf-8'))
+			self.salt = self.salt.decode()
+		else:
+			self.password = password
+			self.salt = salt
 		self.username = username
 		self.address = address
 		self.phone = phone
@@ -13,6 +22,7 @@ class User:
 	def to_dict(self):
 		user_data = self.__dict__
 		del user_data["password"] 
+		del user_data["salt"]
 		return user_data
 
 	def save(self):
@@ -26,7 +36,7 @@ class User:
 		result = None
 		with DB() as db:
 		    result = db.execute(
-		            "SELECT email, password, username, address, phone, id FROM user WHERE id = ?",
+		            "SELECT email, password, username, address, phone, id, salt FROM user WHERE id = ?",
 		            (user_id,))
 		user = result.fetchone()
 		if user is None:
@@ -39,7 +49,7 @@ class User:
 	def all():
 		with DB() as db:
 		    result = db.execute(
-		            "SELECT email, password, username, address, phone, id FROM user").fetchall()
+		            "SELECT email, password, username, address, phone, id, salt FROM user").fetchall()
 		    return [User(*row) for row in result]
 		    
 	@staticmethod
@@ -54,8 +64,8 @@ class User:
 	def __get_save_query(self):
 		query = "{} INTO user {} VALUES {}"
 		if self.id == None:
-		    args = (self.email, self.password, self.username,  self.adress, self.phone)
-		    query = query.format("INSERT", "(email, password, username, address, phone)", args)
+		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.salt)
+		    query = query.format("INSERT", "(email, password, username, address, phone, salt)", args)
 		else:
 		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.id)
 		    query = query.format("REPLACE", "(email, password, username,  address, phone, id)", args)
