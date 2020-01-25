@@ -20,8 +20,11 @@ conn.cursor().execute('''
 CREATE TABLE IF NOT EXISTS users
     (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        address TEXT,
+        phone TEXT        
     )
 ''')
 conn.commit()

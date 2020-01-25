@@ -6,6 +6,7 @@ import json
 
 from order import Order
 from user import User
+from errors import register_error_handlers
 
 app = Flask(__name__)
 
@@ -23,6 +24,43 @@ def require_login(func):
 def hello_world():
     return redirect("/orders")
 
+@app.route("/users", methods = ["POST"])
+def create_user():
+    user_data = request.get_json(force=True, silent=True)
+    if user_data == None:
+        return "Bad request", 400
+    user = User(user_data["email"], user_data["password"], user_data["username"], user_data["address"], user_data["phone"])
+    user.save()
+    return json.dumps(user.to_dict()), 201
+    
+
+@app.route("/users/<user_id>", methods = ["GET"])
+def find_user(user_id):
+    user = User.find(user_id)
+
+    return json.dumps(user.to_dict()), 201
+
+@app.route("/users", methods = ["GET"])
+def list_users():
+    return json.dumps(user.all().to_dict()), 201
+
+@app.route("/users/<user_id>", methods=["PATCH"])
+def edit_user(user_id):
+    user = User.find(user_id)
+    user.username = request.form["username"]
+    user.address = request.form["addresss"]
+    user.phone = request.form["phone"]
+    user.save()
+    
+    return json.dumps(user.to_dict()), 201
+    
+@app.route("/users/<user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    user = User.find(user_id)
+    user.delete()
+
+    return redirect('/')
+    
 
 @app.route('/orders')
 def list_orders():
