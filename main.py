@@ -37,7 +37,7 @@ def find_user(user_id):
 
 @app.route("/users", methods = ["GET"])
 def list_users():
-    return json.dumps(user.all().to_dict()), 201
+    return User.all()
 
 @app.route("/users/<user_id>", methods=["PATCH"])
 def edit_user(user_id):
@@ -51,8 +51,7 @@ def edit_user(user_id):
     
 @app.route("/users/<user_id>", methods=["DELETE"])
 def delete_user(user_id):
-    user = User.find(user_id)
-    user.delete()
+    User.delete(user_id)
 
     return redirect('/')
     

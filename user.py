@@ -75,7 +75,7 @@ class User(AuthUser):
 	def __get_save_query(self):
 		query = "{} INTO user {} VALUES {}"
 		if self.id == None:
-		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.salt.decode('utf-8'))
+		    args = (self.email, self.password, self.username,  self.address, self.phone, self.salt.decode('utf-8'))
 		    query = query.format("INSERT", "(email, password, username, address, phone, salt)", args)
 		else:
 		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.id)

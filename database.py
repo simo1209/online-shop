@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS orders
     )
 ''')
 conn.cursor().execute('''
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE IF NOT EXISTS user
     (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
