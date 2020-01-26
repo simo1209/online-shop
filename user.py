@@ -11,10 +11,9 @@ class User(AuthUser):
 		self.email = email
 		if salt is None:
 			super().set_and_encrypt_password(password.encode('utf-8'),str(int(time.time())).encode('utf-8'))
-			self.salt = self.salt.decode()
 		else:
 			self.password = password
-			self.salt = salt
+			self.salt = salt.encode('utf-8')
 		self.username = username
 		self.address = address
 		self.phone = phone
@@ -44,6 +43,18 @@ class User(AuthUser):
 		            "User with id {} not found".format(user_id), 404)
 		return User(*user)
 
+	@staticmethod
+	def find_by_username(username):
+		result = None
+		with DB() as db:
+		    result = db.execute(
+		            "SELECT email, password, username, address, phone, id, salt FROM user WHERE username = ?",
+		            (username,))
+		user = result.fetchone()
+		if user is None:
+		    raise ApplicationError(
+		            "User with username {} not found".format(username), 404)
+		return User(*user)
 
 	@staticmethod
 	def all():
@@ -64,7 +75,7 @@ class User(AuthUser):
 	def __get_save_query(self):
 		query = "{} INTO user {} VALUES {}"
 		if self.id == None:
-		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.salt)
+		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.salt.decode('utf-8'))
 		    query = query.format("INSERT", "(email, password, username, address, phone, salt)", args)
 		else:
 		    args = (self.email, self.password, self.username,  self.adress, self.phone, self.id)

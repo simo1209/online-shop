@@ -9,19 +9,12 @@ from user import User
 from errors import register_error_handlers
 
 from flaskext.auth import Auth
+from flaskext.auth import login_required
 
 app = Flask(__name__)
 auth = Auth(app)
 
-def require_login(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        token = request.cookies.get('token')
-        if not token or not User.verify_token(token):
-            return redirect('/login')
-        return func(*args, **kwargs)
-    return wrapper
-
+app.secret_key = 'N4BUdSXUzHxNoO8g'
 
 @app.route('/')
 def hello_world():
@@ -92,7 +85,7 @@ def edit_order(id):
 
 
 @app.route('/orders/new', methods=['GET', 'POST'])
-@require_login
+@login_required()
 def new_order():
     if request.method == 'GET':
         return render_template('new_order.html')
@@ -130,14 +123,15 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
-        data = json.loads(request.data.decode('ascii'))
+        data = dict(request.form)
         username = data['username']
         password = data['password']
         user = User.find_by_username(username)
-        if not user or not user.verify_password(password):
-            return jsonify({'token': None})
-        token = user.generate_token()
-        return jsonify({'token': token.decode('ascii')})
+        if user is not None:
+            if user.authenticate(password.encode('utf-8')):
+                return redirect('/')
+        return "Failure", 401
+            
 
 
 if __name__ == '__main__':
