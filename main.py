@@ -22,7 +22,7 @@ def hello_world():
 
 @app.route("/users", methods = ["POST"])
 def create_user():
-    user_data = request.get_json(force=True, silent=True)
+    user_data = request.form
     if user_data == None:
         return "Bad request", 400
     user = User(user_data["email"], user_data["password"], user_data["username"], user_data["address"], user_data["phone"])
@@ -102,20 +102,10 @@ def delete_order(id):
 
     return redirect('/')
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    elif request.method == 'POST':
-        values = (
-            None,
-            request.form['username'],
-            User.hash_password(request.form['password'])
-        )
-        User(*values).create()
-
-        return redirect('/')
-
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
