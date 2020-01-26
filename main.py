@@ -8,11 +8,10 @@ from order import Order
 from user import User
 from errors import register_error_handlers
 
-from flaskext.auth import Auth
-from flaskext.auth import login_required
+from auth import Auth, login_required, get_current_user_data
 
 app = Flask(__name__)
-auth = Auth(app)
+auth = Auth(app, 'login')
 
 app.secret_key = 'N4BUdSXUzHxNoO8g'
 
@@ -71,37 +70,53 @@ def show_order(id):
 
 
 @app.route('/orders/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_order(id):
     order = Order.find(id)
+    current_user = get_current_user_data()
+
+    if order.creator_id != current_user['id']:
+        return "You are not the owner", 403
+
+
     if request.method == 'GET':
         return render_template('edit_order.html',order=order)
     elif request.method == 'POST':
         order.name = request.form['name']
         order.description = request.form['description']
-        order.content = request.form['price']
+        order.price = request.form['price']
         order.active = request.form['active']
         order.save()
         return redirect(url_for('show_order', id=order.id))
 
 
 @app.route('/orders/new', methods=['GET', 'POST'])
-@login_required()
+@login_required
 def new_order():
     if request.method == 'GET':
         return render_template('new_order.html')
     elif request.method == 'POST':
-        
-        Order(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None).create()
+        current_user = get_current_user_data()
+        Order(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None, creator_id = current_user['id']).create()
 
         return redirect('/')
 
 
 @app.route('/orders/<int:id>/delete', methods=['POST'])
+@login_required
 def delete_order(id):
     order = Order.find(id)
-    order.delete()
+    current_user = get_current_user_data()
 
-    return redirect('/')
+    if current_user is not None:
+        if order.creator_id == current_user['id']:
+            order.delete()
+        else:
+            return 'You are not the owner',403
+        return redirect('/')
+    else:
+        return 'Need to login', 401  
+
 
 @app.route('/register', methods=['GET'])
 def register():

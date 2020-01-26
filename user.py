@@ -1,7 +1,7 @@
 from database import DB
 from errors import ApplicationError
 
-from flaskext.auth.auth import AuthUser
+from auth import AuthUser
 
 import time
 

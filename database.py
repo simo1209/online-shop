@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS orders
         description TEXT,
         price REAL,
         date_added TEXT,
+        creator_id INTEGER,
         active BOOLEAN,
         buyer_id INTEGER
     )

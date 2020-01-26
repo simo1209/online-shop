@@ -1,7 +1,7 @@
 from database import DB
 
 class Order:
-    def __init__(self, id, name, description, price, date_added, active = 1, buyer_id = 0):
+    def __init__(self, id, name, description, price, date_added, creator_id, active = 1, buyer_id = 0):
         self.id = id
         self.name = name
         self.description = description
@@ -9,6 +9,7 @@ class Order:
         self.date_added = date_added
         self.active = active
         self.buyer_id = buyer_id
+        self.creator_id = creator_id
 
     @staticmethod
     def all():
@@ -27,10 +28,10 @@ class Order:
 
     def create(self):
         with DB() as db:
-            values = (self.name, self.description, self.price, self.active, self.buyer_id)
+            values = (self.name, self.description, self.price, self.creator_id, self.active, self.buyer_id)
             db.execute('''
-                INSERT INTO orders (name, description, price, date_added, active, buyer_id)
-                VALUES (?, ?, ?, date('now'), ?, ?)''', values)
+                INSERT INTO orders (name, description, price, creator_id, date_added, active, buyer_id)
+                VALUES (?, ?, ?, ?, date('now'), ?, ?)''', values)
             return self
 
     def save(self):
