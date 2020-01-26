@@ -15,9 +15,9 @@ auth = Auth(app, 'login')
 
 app.secret_key = 'N4BUdSXUzHxNoO8g'
 
-@app.route('/')
+@app.route('/orders')
 def hello_world():
-    return redirect("/orders")
+    return redirect("/")
 
 @app.route("/users", methods = ["POST"])
 def create_user():
@@ -56,7 +56,7 @@ def delete_user(user_id):
     return redirect('/')
     
 
-@app.route('/orders')
+@app.route('/')
 def list_orders():
     return render_template('orders.html', orders=Order.all())
 
