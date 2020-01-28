@@ -1,0 +1,10 @@
+<title>Ads</title>
+
+<a href="/ads/new">New ad</a>
+
+<h1>Ads</h1>
+{% for ad in ads %}
+<a href="/ads/{{ ad.id }}"><b>Name:</b> {{ ad.name }} | Description: {{ ad.description }}</a>
+<br/>
+{% endfor %}
+

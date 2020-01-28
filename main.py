@@ -4,7 +4,7 @@ from flask import Flask
 from flask import render_template, request, redirect, url_for, jsonify
 import json
 
-from order import Order
+from ad import Ad
 from user import User
 from errors import register_error_handlers, ApplicationError
 
@@ -53,76 +53,76 @@ def delete_user(user_id):
     return redirect('/')
     
 
-@app.route('/api/orders')
-def list_orders():
-    return jsonify([order.__dict__ for order in Order.all()])
+@app.route('/api/ads')
+def list_ads():
+    return jsonify([ad.__dict__ for ad in Ad.all()])
 
 @app.route('/')
 def index():
-    return redirect('/orders')
+    return redirect('/ads')
 
-@app.route('/orders')
-def render_all_orders():
-    return render_template('orders.html', orders = Order.all())
+@app.route('/ads')
+def render_all_ads():
+    return render_template('ads.html', ads = Ad.all())
 
 
-@app.route('/api/orders/<int:id>')
-def show_order(id):
-    order = Order.find(id)
-    return jsonify(order.__dict__)
+@app.route('/api/ads/<int:id>')
+def show_ad(id):
+    ad = Ad.find(id)
+    return jsonify(ad.__dict__)
 
-@app.route('/orders/<int:id>')
-def render_order(id):
-    return render_template('order.html', order = Order.find(id))
+@app.route('/ads/<int:id>')
+def render_ad(id):
+    return render_template('ad.html', ad = Ad.find(id))
 
-@app.route('/orders/<int:id>/edit')
+@app.route('/ads/<int:id>/edit')
 @login_required
-def render_order_edit(id):
-    order = Order.find(id)
+def render_ad_edit(id):
+    ad = Ad.find(id)
     current_user = get_current_user_data()
 
-    if order.creator_id != current_user['id']:
-        raise ApplicationError("You are not the owner of this order", 401)
-    return render_template('edit_order.html',order=order)
+    if ad.creator_id != current_user['id']:
+        raise ApplicationError("You are not the owner of this ad", 401)
+    return render_template('edit_ad.html',ad=ad)
 
-@app.route('/api/orders/<int:id>/edit', methods=['POST'])
+@app.route('/api/ads/<int:id>/edit', methods=['POST'])
 @login_required
-def edit_order(id):
-    order = Order.find(id)
+def edit_ad(id):
+    ad = Ad.find(id)
     current_user = get_current_user_data()
 
-    if order.creator_id != current_user['id']:
-        raise ApplicationError("You are not the owner of this order", 401)
+    if ad.creator_id != current_user['id']:
+        raise ApplicationError("You are not the owner of this ad", 401)
 
-    order.name = request.form['name']
-    order.description = request.form['description']
-    order.price = request.form['price']
-    order.save()
-    return redirect(url_for('show_order', id=order.id))
+    ad.name = request.form['name']
+    ad.description = request.form['description']
+    ad.price = request.form['price']
+    ad.save()
+    return redirect(url_for('show_ad', id=ad.id))
 
-@app.route('/orders/new')
+@app.route('/ads/new')
 @login_required
-def render_order_form():
-    return render_template('new_order.html')
+def render_ad_form():
+    return render_template('new_ad.html')
 
-@app.route('/api/orders/new', methods=['POST'])
+@app.route('/api/ads/new', methods=['POST'])
 @login_required
-def new_order():
+def new_ad():
     current_user = get_current_user_data()
-    Order(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None, creator_id = current_user['id']).create()
+    Ad(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None, creator_id = current_user['id']).create()
 
     return redirect('/')
 
 
-@app.route('/api/orders/<int:id>/delete', methods=['POST'])
+@app.route('/api/ads/<int:id>/delete', methods=['POST'])
 @login_required
-def delete_order(id):
-    order = Order.find(id)
+def delete_ad(id):
+    ad = Ad.find(id)
     current_user = get_current_user_data()
 
     if current_user is not None:
-        if order.creator_id == current_user['id']:
-            order.delete()
+        if ad.creator_id == current_user['id']:
+            ad.delete()
         else:
             return 'You are not the owner',403
         return redirect('/')

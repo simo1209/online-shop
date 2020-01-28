@@ -1,0 +1,15 @@
+<title>Ad</title>
+<a href="/">Home</a>
+
+<h1>{{ ad.name }}</h1>
+<h2>Price: {{ ad.price }}</h2>
+<hr>
+<p>
+{{ ad.description }}
+</p>
+
+<a href="/ads/{{ ad.id }}/edit">Edit ad</a><br/><br/>
+<form action="/api/ads/{{ ad.id }}/delete" method="POST">
+  <button type="submit">Delete ad</button>
+</form>
+<br/>

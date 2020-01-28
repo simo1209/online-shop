@@ -1,0 +1,12 @@
+<form action="/api/ads/{{ ad.id }}/edit" method="POST">
+  <label>Name</label>
+  <input name="name" value="{{ ad.name }}"/>
+  </br>
+  <label>Description</label>
+  <input name="description" value="{{ ad.description }}"/>
+  </br>
+  <label>Price</label>
+  <input name="price" value="{{ ad.price }}"/>
+  </br>
+  <button type="submit">Submit</button>
+</form>

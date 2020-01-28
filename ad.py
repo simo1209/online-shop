@@ -2,7 +2,7 @@ from database import DB
 from errors import ApplicationError
 
 
-class Order:
+class Ad:
     def __init__(self, id, name, description, price, date_added, creator_id, active = 1, buyer_id = 0):
         self.id = id
         self.name = name
@@ -16,25 +16,25 @@ class Order:
     @staticmethod
     def all():
         with DB() as db:
-            rows = db.execute('SELECT * FROM orders').fetchall()
-            return [Order(*row) for row in rows]
+            rows = db.execute('SELECT * FROM ads').fetchall()
+            return [Ad(*row) for row in rows]
 
     @staticmethod
     def find(id):
         with DB() as db:
             row = db.execute(
-                'SELECT * FROM orders WHERE id = ?',
+                'SELECT * FROM ads WHERE id = ?',
                 (id,)
             ).fetchone()
             if row is None:
-                raise ApplicationError("Order doesnt exist", 404)
-            return Order(*row)
+                raise ApplicationError("Ad doesnt exist", 404)
+            return Ad(*row)
 
     def create(self):
         with DB() as db:
             values = (self.name, self.description, self.price, self.creator_id, self.active, self.buyer_id)
             db.execute('''
-                INSERT INTO orders (name, description, price, creator_id, date_added, active, buyer_id)
+                INSERT INTO ads (name, description, price, creator_id, date_added, active, buyer_id)
                 VALUES (?, ?, ?, ?, date('now'), ?, ?)''', values)
             return self
 
@@ -49,12 +49,12 @@ class Order:
                 self.id
             )
             db.execute(
-                '''UPDATE orders
+                '''UPDATE ads
                 SET name = ?, description = ?, price = ?, active = ?, buyer_id = ?
                 WHERE id = ?''', values)
             return self
 
     def delete(self):
         with DB() as db:
-            db.execute('DELETE FROM orders WHERE id = ?', (self.id,))
+            db.execute('DELETE FROM ads WHERE id = ?', (self.id,))
 

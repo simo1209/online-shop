@@ -5,7 +5,7 @@ DB_NAME = 'example.db'
 conn = sqlite3.connect(DB_NAME)
 
 conn.cursor().execute('''
-CREATE TABLE IF NOT EXISTS orders
+CREATE TABLE IF NOT EXISTS ads
     (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
