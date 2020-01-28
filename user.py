@@ -2,6 +2,7 @@ from database import DB
 from errors import ApplicationError
 
 from auth import AuthUser
+from ad import Ad
 
 import time
 
@@ -71,6 +72,11 @@ class User(AuthUser):
 		            (user_id,))
 		if result.rowcount == 0:
 		    raise ApplicationError("No value present", 404)
+
+	def get_ads(self):
+		with DB() as db:
+			rows = db.execute('SELECT * FROM ads WHERE active = 0 AND creator_id = ?', (self.id,)).fetchall()
+			return [Ad(*row) for row in rows]
 
 	def __get_save_query(self):
 		query = "{} INTO user {} VALUES {}"

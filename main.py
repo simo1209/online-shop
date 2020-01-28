@@ -129,6 +129,19 @@ def delete_ad(id):
     else:
         return 'Need to login', 401  
 
+@app.route('/api/user/ads')
+@login_required
+def user_ads():
+    current_user = User.find(get_current_user_data()['id'])
+    ads = current_user.get_ads()
+    return jsonify([ad.__dict__ for ad in ads])
+
+@app.route('/user/ads')
+@login_required
+def render_user_ads():
+    current_user = User.find(get_current_user_data()['id'])
+    ads = current_user.get_ads()
+    return render_template('ads.html', ads = ads)
 
 @app.route('/register', methods=['GET'])
 def register():
@@ -147,7 +160,7 @@ def login():
         if user is not None:
             if user.authenticate(password.encode('utf-8')):
                 return redirect('/')
-        return "Failure", 401
+        return ApplicationError("Credentials failed", 401)
             
 
 
