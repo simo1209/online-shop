@@ -6,18 +6,15 @@ import json
 
 from order import Order
 from user import User
-from errors import register_error_handlers
+from errors import register_error_handlers, ApplicationError
 
 from auth import Auth, login_required, get_current_user_data
 
 app = Flask(__name__)
+register_error_handlers(app)
 auth = Auth(app, 'login')
 
 app.secret_key = 'N4BUdSXUzHxNoO8g'
-
-@app.route('/orders')
-def hello_world():
-    return redirect("/")
 
 @app.route("/users", methods = ["POST"])
 def create_user():
@@ -56,52 +53,68 @@ def delete_user(user_id):
     return redirect('/')
     
 
-@app.route('/')
+@app.route('/api/orders')
 def list_orders():
-    return render_template('orders.html', orders=Order.all())
+    return jsonify([order.__dict__ for order in Order.all()])
+
+@app.route('/')
+def index():
+    return redirect('/orders')
+
+@app.route('/orders')
+def render_all_orders():
+    return render_template('orders.html', orders = Order.all())
 
 
-@app.route('/orders/<int:id>')
+@app.route('/api/orders/<int:id>')
 def show_order(id):
     order = Order.find(id)
+    return jsonify(order.__dict__)
 
-    return render_template('order.html', order=order)
+@app.route('/orders/<int:id>')
+def render_order(id):
+    return render_template('order.html', order = Order.find(id))
 
+@app.route('/orders/<int:id>/edit')
+@login_required
+def render_order_edit(id):
+    order = Order.find(id)
+    current_user = get_current_user_data()
 
-@app.route('/orders/<int:id>/edit', methods=['GET', 'POST'])
+    if order.creator_id != current_user['id']:
+        raise ApplicationError("You are not the owner of this order", 401)
+    return render_template('edit_order.html',order=order)
+
+@app.route('/api/orders/<int:id>/edit', methods=['POST'])
 @login_required
 def edit_order(id):
     order = Order.find(id)
     current_user = get_current_user_data()
 
     if order.creator_id != current_user['id']:
-        return "You are not the owner", 403
+        raise ApplicationError("You are not the owner of this order", 401)
 
+    order.name = request.form['name']
+    order.description = request.form['description']
+    order.price = request.form['price']
+    order.save()
+    return redirect(url_for('show_order', id=order.id))
 
-    if request.method == 'GET':
-        return render_template('edit_order.html',order=order)
-    elif request.method == 'POST':
-        order.name = request.form['name']
-        order.description = request.form['description']
-        order.price = request.form['price']
-        order.active = request.form['active']
-        order.save()
-        return redirect(url_for('show_order', id=order.id))
+@app.route('/orders/new')
+@login_required
+def render_order_form():
+    return render_template('new_order.html')
 
-
-@app.route('/orders/new', methods=['GET', 'POST'])
+@app.route('/api/orders/new', methods=['POST'])
 @login_required
 def new_order():
-    if request.method == 'GET':
-        return render_template('new_order.html')
-    elif request.method == 'POST':
-        current_user = get_current_user_data()
-        Order(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None, creator_id = current_user['id']).create()
+    current_user = get_current_user_data()
+    Order(id = None, name = request.form['name'], description = request.form['description'], price = request.form['price'], date_added = None, creator_id = current_user['id']).create()
 
-        return redirect('/')
+    return redirect('/')
 
 
-@app.route('/orders/<int:id>/delete', methods=['POST'])
+@app.route('/api/orders/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_order(id):
     order = Order.find(id)

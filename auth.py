@@ -1,5 +1,7 @@
 """
 Fixed version of Flask Auth
+login_required decorator didn't have wrap
+_redirect_to_login didn't have needed arguments
 """
 
 

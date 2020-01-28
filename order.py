@@ -1,4 +1,6 @@
 from database import DB
+from errors import ApplicationError
+
 
 class Order:
     def __init__(self, id, name, description, price, date_added, creator_id, active = 1, buyer_id = 0):
@@ -24,6 +26,8 @@ class Order:
                 'SELECT * FROM orders WHERE id = ?',
                 (id,)
             ).fetchone()
+            if row is None:
+                raise ApplicationError("Order doesnt exist", 404)
             return Order(*row)
 
     def create(self):

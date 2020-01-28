@@ -1,4 +1,4 @@
-<form action="/orders/{{ order.id }}/edit" method="POST">
+<form action="/api/orders/{{ order.id }}/edit" method="POST">
   <label>Name</label>
   <input name="name" value="{{ order.name }}"/>
   </br>
@@ -7,12 +7,6 @@
   </br>
   <label>Price</label>
   <input name="price" value="{{ order.price }}"/>
-  </br>
-  <label>Is Active</label>
-  <input name="active" value="{{ order.active }}"/>
-  </br>
-  <label>Buyer Id</label>
-  <input name="buyer_id" value="{{ order.buyer_id }}"/>
   </br>
   <button type="submit">Submit</button>
 </form>
