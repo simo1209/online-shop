@@ -98,7 +98,7 @@ def edit_ad(id):
     ad.description = request.form['description']
     ad.price = request.form['price']
     ad.save()
-    return redirect(url_for('show_ad', id=ad.id))
+    return redirect(url_for('render_ad', id=ad.id))
 
 @app.route('/ads/new')
 @login_required
